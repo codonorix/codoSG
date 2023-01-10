@@ -1,0 +1,10 @@
+name: CodoSG
+version: '${project.version}'
+main: net.codeup.codosg.CodoSG
+api-version: 1.19
+authors: [ logan ]
+commands:
+  createArena:
+    description: "Create a new arena."
+  arena:
+    description: "All core arena commands."
