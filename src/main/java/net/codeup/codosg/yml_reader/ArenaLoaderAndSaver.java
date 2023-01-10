@@ -21,7 +21,7 @@ public class ArenaLoaderAndSaver {
 		if(loadFile.getConfigurationSection("maps") == null) return;
 		for (String path : loadFile.getConfigurationSection("maps").getKeys(false)) {
 			int id = loadFile.getInt("maps." + path + ".id");
-			String arenaName = loadFile.getString("maps." + path + ".name");
+			String arenaName = loadFile.getString("maps." + path + ".name").toLowerCase();
 			Location waitingLobby = loadFile.getLocation("maps." + path + ".waitingLobby");
 			List<Location> spawnPoints = (List<Location>) loadFile.getList("maps." + path + ".spawnPoints");
 			List<Location> chestLocations = (List<Location>) loadFile.getList("maps." + path + ".chestLocaitons");
