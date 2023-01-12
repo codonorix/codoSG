@@ -2,13 +2,14 @@ package net.codeup.codosg.arena_creator;
 
 import net.codeup.codosg.CodoSG;
 import net.codeup.codosg.arena_creator.arena_command_inv.ListArenasInv;
+import net.codeup.codosg.arena_creator.arena_command_inv.arena_edit_gui.ArenaEditInv;
+import net.codeup.codosg.items.WeaponItems;
 import net.codeup.codosg.object_instances.AllArenas;
 import net.codeup.codosg.objects.ArenaObject;
 import net.codeup.codosg.yml_reader.ArenaLoaderAndSaver;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,9 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ArenaCoreCommand implements CommandExecutor {
 	@Override
@@ -80,7 +79,7 @@ public class ArenaCoreCommand implements CommandExecutor {
 	}
 
 	private void editArena(String[] args, Player player) throws IOException {
-		if(args.length < 2) {
+		if(args.length < 1) {
 			player.sendMessage(suggestedEditCommands());
 			return;
 		}
@@ -92,48 +91,76 @@ public class ArenaCoreCommand implements CommandExecutor {
 
 		String arenaName = args[1];
 
+
 		if(args[2].equalsIgnoreCase("setLobby")) {
-			ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
-			arenaObject.setWaitingLobby(player.getLocation());
-			player.sendMessage(ChatColor.GREEN + "Waiting lobby set!");
-			new ArenaLoaderAndSaver().saveMaps();
+			setLobby(player, arenaName);
 			return;
 		}
 
 		if(args[2].equalsIgnoreCase("setSpawn")) {
-			ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
-
-			List<Location> locations = new ArrayList<>();
-
-			if(arenaObject.getSpawnPoints() != null) {
-				locations = arenaObject.getSpawnPoints();
-			}
-
-			locations.add(player.getLocation());
-			arenaObject.setSpawnPoints(locations);
-			player.sendMessage(ChatColor.GREEN + "Spawn point added!");
-			new ArenaLoaderAndSaver().saveMaps();
+			setSpawnPoint(player, arenaName);
+			return;
 		}
 
-		if(args[2].equalsIgnoreCase("placeChest")) {
-			ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
-			player.getInventory().addItem(chestItem(arenaName));
+		if(args[2].equalsIgnoreCase("loadChests")) {
+			loadChests(player, arenaName);
+			return;
 		}
+
+		if(args[2].equalsIgnoreCase("gui")) {
+			arenaGUI(player,arenaName);
+		}
+
 	}
 
-	private ItemStack chestItem(String arenaName) {
-		ItemStack itemStack = new ItemStack(Material.CHEST);
-		ItemMeta itemMeta = itemStack.getItemMeta();
+	private void setLobby(Player player, String arenaName) throws IOException {
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
+		arenaObject.setWaitingLobby(player.getLocation());
+		player.sendMessage(ChatColor.GREEN + "Waiting lobby set!");
+		new ArenaLoaderAndSaver().saveMaps();
+	}
 
-		itemMeta.setDisplayName(ChatColor.DARK_PURPLE + arenaName + " chest");
-		itemMeta.setLore(new ArrayList<>(Arrays.asList("Place item to add chest to map.")));
+	private void setSpawnPoint(Player player, String arenaName) throws IOException {
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
 
-		NamespacedKey namespacedKey = new NamespacedKey(CodoSG.getInstance(), arenaName);
-		itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING,arenaName);
+		List<Location> locations = new ArrayList<>();
 
-		itemStack.setItemMeta(itemMeta);
+		if(arenaObject.getSpawnPoints() != null) {
+			locations = arenaObject.getSpawnPoints();
+		}
 
-		return itemStack;
+		locations.add(player.getLocation());
+		arenaObject.setSpawnPoints(locations);
+		player.sendMessage(ChatColor.GREEN + "Spawn point added!");
+		new ArenaLoaderAndSaver().saveMaps();
+	}
+
+	public void loadChests(Player player, String arenaName) throws IOException {
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
+		World world = arenaObject.getSpawnPoints().get(0).getWorld();
+
+		ArrayList<Location> chests = new ArrayList<>();
+		for(Chunk chunk : world.getLoadedChunks()) {
+			for (BlockState blockState : chunk.getTileEntities()) {
+				if(blockState instanceof Chest) {
+					chests.add(blockState.getLocation());
+					Chest chest = (Chest) blockState;
+					chest.getBlockInventory().clear();
+					ArrayList<ItemStack> itemStacks = new WeaponItems().getInstance();
+					Collections.shuffle(itemStacks);
+					chest.getBlockInventory().addItem(itemStacks.get(0));
+				}
+			}
+		}
+
+		arenaObject.setChestLocations(chests);
+		player.sendMessage("Total chests in arena: " + chests.size());
+		new ArenaLoaderAndSaver().saveMaps();
+	}
+
+	private void arenaGUI(Player player, String arenaName) {
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
+		player.openInventory(new ArenaEditInv().arenaEditInv(arenaObject));
 	}
 
 	private String suggestedCommands() {
@@ -154,7 +181,7 @@ public class ArenaCoreCommand implements CommandExecutor {
 		output += ChatColor.RED + "/arena edit {arena_name} {action}\n";
 		output += ChatColor.GREEN + "setLobby │ Sets the map waiting lobby.\n";
 		output += ChatColor.GREEN + "setSpawn │ Sets a player spawn location.\n";
-		output += ChatColor.GREEN + "placeChest │ Gives you a chest to place that will spawn items.\n";
+		output += ChatColor.GREEN + "loadChests │ Loads all the chests in an arena.\n";
 		output += "\n";
 		output += ChatColor.LIGHT_PURPLE + "" + ChatColor.STRIKETHROUGH + "———————————————————————\n";
 

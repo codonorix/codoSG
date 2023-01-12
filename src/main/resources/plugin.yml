@@ -8,3 +8,5 @@ commands:
     description: "Create a new arena."
   arena:
     description: "All core arena commands."
+  join:
+    description: "Join an arena"

@@ -2,7 +2,9 @@ package net.codeup.codosg;
 
 import net.codeup.codosg.arena_creator.ArenaCoreCommand;
 import net.codeup.codosg.arena_creator.ArenaCreatorCommand;
+import net.codeup.codosg.arena_creator.arena_command_inv.arena_edit_gui.ArenaEditClickEvent;
 import net.codeup.codosg.arena_creator.events.ChestPlaceEvent;
+import net.codeup.codosg.commands.JoinArena;
 import net.codeup.codosg.yml_reader.ArenaLoaderAndSaver;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -58,8 +60,10 @@ public final class CodoSG extends JavaPlugin {
 		//?================================================================================
 		getCommand("createArena").setExecutor(new ArenaCreatorCommand());
 		getCommand("arena").setExecutor(new ArenaCoreCommand());
+		getCommand("join").setExecutor(new JoinArena());
 
 		Bukkit.getPluginManager().registerEvents(new ChestPlaceEvent(), this);
+		Bukkit.getPluginManager().registerEvents(new ArenaEditClickEvent(), this);
 	}
 
 	@Override
