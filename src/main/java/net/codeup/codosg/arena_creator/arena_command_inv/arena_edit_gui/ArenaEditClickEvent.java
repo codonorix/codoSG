@@ -63,14 +63,16 @@ public class ArenaEditClickEvent implements Listener {
 		}
 	}
 
-	private void waitingLobbyButton(String arenaName, Player player) {
+	private void waitingLobbyButton(String arenaName, Player player) throws IOException {
 		ArenaObject arena = AllArenas.getInstance().get(arenaName);
 		if (arena.getWaitingLobby() == null) {
 			arena.setWaitingLobby(player.getLocation());
 			player.sendMessage(ChatColor.GREEN + "[!] Arena waiting lobby set!");
+			new ArenaLoaderAndSaver().saveMaps();
 		} else {
 			arena.setWaitingLobby(null);
 			player.sendMessage(ChatColor.GREEN + "[!] Arena waiting lobby deleted!");
+			new ArenaLoaderAndSaver().saveMaps();
 		}
 
 		player.closeInventory();

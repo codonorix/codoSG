@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArenaCreatorCommand implements CommandExecutor {
 	@Override
@@ -28,7 +30,7 @@ public class ArenaCreatorCommand implements CommandExecutor {
 			return false;
 		}
 
-		ArenaObject arenaObject = new ArenaObject(AllArenas.getInstance().size(), args[0], null, null,null,false);
+		ArenaObject arenaObject = new ArenaObject(AllArenas.getInstance().size(), args[0], null, null,null,false, new ArrayList<>());
 		AllArenas.getInstance().put(args[0], arenaObject);
 
 		try {

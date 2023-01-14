@@ -1,6 +1,7 @@
 package net.codeup.codosg.objects;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +13,15 @@ public class ArenaObject {
 	private List<Location> spawnPoints;
 	private List<Location> chestLocations;
 	private boolean inGame;
-
-	public ArenaObject(int id, String name, Location waitingLobby, List<Location> spawnPoints, List<Location> chestLocations, boolean inGame) {
+	private List<Player> playersInGame;
+	public ArenaObject(int id, String name, Location waitingLobby, List<Location> spawnPoints, List<Location> chestLocations, boolean inGame, List<Player> playersInGame) {
 		this.id = id;
 		this.name = name;
 		this.waitingLobby = waitingLobby;
 		this.spawnPoints = spawnPoints;
 		this.chestLocations = chestLocations;
 		this.inGame = inGame;
+		this.playersInGame = playersInGame;
 	}
 
 	public int getId() {
@@ -68,5 +70,26 @@ public class ArenaObject {
 
 	public void setInGame(boolean inGame) {
 		this.inGame = inGame;
+	}
+
+	public List<Player> getPlayersInGame() {
+		return playersInGame;
+	}
+
+	public void setPlayersInGame(List<Player> playersInGame) {
+		this.playersInGame = playersInGame;
+	}
+
+	@Override
+	public String toString() {
+		return "ArenaObject{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				", waitingLobby=" + waitingLobby +
+				", spawnPoints=" + spawnPoints +
+				", chestLocations=" + chestLocations +
+				", inGame=" + inGame +
+				", playersInGame=" + playersInGame +
+				'}';
 	}
 }

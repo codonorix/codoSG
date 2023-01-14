@@ -1,36 +1,58 @@
 package net.codeup.codosg.items;
 
+import net.codeup.codosg.CodoSG;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.data.type.Switch;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 
 public class ItemCreator {
-	protected static ItemStack itemCreator(String name, ArrayList<String> lore, ArrayList<Enchantment> enchantments, Material material, int amount, int rarity) {
-		ItemStack itemStack = new ItemStack(material, amount);
+	private String name;
+	private ArrayList<String> lore;
+	private ArrayList<Enchantment> enchantments;
+	private Material material;
+	private int amount;
+	private int rarity;
+
+	public ItemCreator(String name, ArrayList<String> lore, ArrayList<Enchantment> enchantments, Material material, int amount, int rarity) {
+		this.name = name;
+		this.lore = lore;
+		this.enchantments = enchantments;
+		this.material = material;
+		this.amount = amount;
+		this.rarity = rarity;
+	}
+
+	ItemStack generateItem() {
+		ItemStack itemStack = new ItemStack(this.getMaterial(), this.getAmount());
 		ItemMeta itemMeta = itemStack.getItemMeta();
 
-		itemMeta.setDisplayName(name);
+		itemMeta.setDisplayName(this.getName());
 		ArrayList<String> itemDescription = new ArrayList<>();
 
-		if(lore != null) {
-			itemDescription.addAll(lore);
+		if(this.getLore() != null) {
+			itemDescription.addAll(this.getLore());
 		}
 
-		itemDescription.add(addRarity(rarity));
+		itemDescription.add(addRarity(this.getRarity()));
 		itemMeta.setLore(itemDescription);
 
 //		if(enchantments != null) itemMeta.addEnchant() TODO - Add enchantment
+
+		NamespacedKey rarityKey = new NamespacedKey(CodoSG.getInstance(), "RARITY_KEY");
+		itemMeta.getPersistentDataContainer().set(rarityKey, PersistentDataType.INTEGER, this.getRarity());
 
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}
 
-	private static String addRarity(int rarity) {
+	private String addRarity(int rarity) {
 		String output = "";
 		switch (rarity) {
 			case 0:
@@ -47,5 +69,53 @@ public class ItemCreator {
 				return output + ChatColor.DARK_PURPLE + "" + ChatColor.MAGIC + "✪" + ChatColor.LIGHT_PURPLE + " MYTHICAL " + ChatColor.DARK_PURPLE + "" + ChatColor.MAGIC + "✪";
 		}
 		return "ERR";
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public ArrayList<String> getLore() {
+		return lore;
+	}
+
+	public void setLore(ArrayList<String> lore) {
+		this.lore = lore;
+	}
+
+	public ArrayList<Enchantment> getEnchantments() {
+		return enchantments;
+	}
+
+	public void setEnchantments(ArrayList<Enchantment> enchantments) {
+		this.enchantments = enchantments;
+	}
+
+	public Material getMaterial() {
+		return material;
+	}
+
+	public void setMaterial(Material material) {
+		this.material = material;
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+
+	public int getRarity() {
+		return rarity;
+	}
+
+	public void setRarity(int rarity) {
+		this.rarity = rarity;
 	}
 }

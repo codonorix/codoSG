@@ -26,7 +26,7 @@ public class ArenaLoaderAndSaver {
 			List<Location> spawnPoints = (List<Location>) loadFile.getList("maps." + path + ".spawnPoints");
 			List<Location> chestLocations = (List<Location>) loadFile.getList("maps." + path + ".chestLocaitons");
 
-			ArenaObject arenaObject = new ArenaObject(id, arenaName, waitingLobby, spawnPoints, chestLocations, false);
+			ArenaObject arenaObject = new ArenaObject(id, arenaName, waitingLobby, spawnPoints, chestLocations, false, new ArrayList<>());
 			AllArenas.getInstance().put(arenaName, arenaObject);
 		}
 	}
