@@ -9,12 +9,19 @@ import net.codeup.codosg.arena_creator.arena_signs.SignDestroy;
 import net.codeup.codosg.arena_creator.arena_signs.SignJoin;
 import net.codeup.codosg.arena_creator.events.ChestPlaceEvent;
 import net.codeup.codosg.commands.JoinArena;
+import net.codeup.codosg.commands.admin.CrystalsGive;
+import net.codeup.codosg.commands.admin.KitTable;
 import net.codeup.codosg.lobby.JoinEvent;
 import net.codeup.codosg.lobby.LeaveEvent;
+import net.codeup.codosg.lobby.kit_table.KitTableEffect;
+import net.codeup.codosg.lobby.kit_table.KitTableOpen;
 import net.codeup.codosg.lobby.lobby_events.ItemClickEvent;
+import net.codeup.codosg.lobby.lobby_events.KitClickEvent;
 import net.codeup.codosg.lobby.lobby_events.LobbyMenuClickEvent;
 import net.codeup.codosg.yml_reader.ArenaLoaderAndSaver;
 import net.codeup.codosg.yml_reader.JoinSignLoaderAndSaver;
+import net.codeup.codosg.yml_reader.KitTableLoaderAndSaver;
+import net.codeup.codosg.yml_reader.PlayerDataSaver;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -91,6 +98,22 @@ public final class CodoSG extends JavaPlugin {
 			}
 		}
 
+		//? KitTables =====================================================================
+		File kitTables = new File(getDataFolder(), "kitTable.yml");
+
+		if(!getDataFolder().exists()) {
+			getDataFolder().mkdir();
+		}
+
+		if(!kitTables.exists()) {
+			try {
+				kitTables.createNewFile();
+				YamlConfiguration loadFile = YamlConfiguration.loadConfiguration(kitTables);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
 		//Load Arenas
 		try {
 			new ArenaLoaderAndSaver().loadMaps();
@@ -101,6 +124,14 @@ public final class CodoSG extends JavaPlugin {
 		//Load join signs
 		try {
 			new JoinSignLoaderAndSaver().loadSigns();
+			new KitTableEffect().kitTableEffect();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		//Load KitTables
+		try {
+			new KitTableLoaderAndSaver().loadTables();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -108,6 +139,9 @@ public final class CodoSG extends JavaPlugin {
 		getCommand("createArena").setExecutor(new ArenaCreatorCommand());
 		getCommand("arena").setExecutor(new ArenaCoreCommand());
 		getCommand("join").setExecutor(new JoinArena());
+		getCommand("kittable").setExecutor(new KitTable());
+		getCommand("crystalsgive").setExecutor(new CrystalsGive());
+
 
 		Bukkit.getPluginManager().registerEvents(new ChestPlaceEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new ArenaEditClickEvent(), this);
@@ -119,6 +153,9 @@ public final class CodoSG extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new LobbyMenuClickEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new LeaveEvent(), this);
+		Bukkit.getPluginManager().registerEvents(new KitTable(), this);
+		Bukkit.getPluginManager().registerEvents(new KitTableOpen(), this);
+		Bukkit.getPluginManager().registerEvents(new KitClickEvent(), this);
 
 		//?======================| ACHIVE EVENTS |=============================
 		Bukkit.getPluginManager().registerEvents(new ChallengeAchivements(), this);
@@ -126,6 +163,11 @@ public final class CodoSG extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		try {
+			new PlayerDataSaver().saveUsers();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		// Plugin shutdown logic
 	}
 

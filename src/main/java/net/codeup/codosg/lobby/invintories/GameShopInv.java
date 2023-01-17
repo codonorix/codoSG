@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.ArrayList;
+
 public class GameShopInv {
 	NamespacedKey key = new NamespacedKey(CodoSG.getInstance(), "LOBBY_ITEM");
 	public Inventory menu() {
@@ -20,6 +22,7 @@ public class GameShopInv {
 		inventory.setItem(12, rareKits());
 		inventory.setItem(14, EpicKits());
 		inventory.setItem(16, powerUps());
+		inventory.setItem(22, buyKey());
 
 		return inventory;
 	}
@@ -70,6 +73,26 @@ public class GameShopInv {
 		itemMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "Power Ups");
 
 		itemMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, "POWER_UPS");
+
+		itemStack.setItemMeta(itemMeta);
+
+		return itemStack;
+	}
+
+	private ItemStack buyKey() {
+		ItemStack itemStack = new ItemStack(Material.GOLDEN_SHOVEL);
+		ItemMeta itemMeta = itemStack.getItemMeta();
+
+		itemMeta.setDisplayName(ChatColor.AQUA + "Buy a Key");
+
+		itemMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, "BUY_KEY");
+
+		ArrayList<String> lore = new ArrayList<>();
+		lore.add(ChatColor.WHITE + "Buy a Key to use at the kit table");
+		lore.add("");
+		lore.add(ChatColor.WHITE + "1 key = " + ChatColor.LIGHT_PURPLE + " 2500 Crystals");
+
+		itemMeta.setLore(lore);
 
 		itemStack.setItemMeta(itemMeta);
 

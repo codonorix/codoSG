@@ -10,3 +10,7 @@ commands:
     description: "All core arena commands."
   join:
     description: "Join an arena"
+  kittable:
+    description: "Get a kit table to place."
+  crystalsgive:
+    description: "Give player crystals"

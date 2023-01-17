@@ -7,6 +7,10 @@ import net.codeup.codosg.object_instances.AllPlayers;
 import net.codeup.codosg.objects.KitObject;
 import net.codeup.codosg.objects.PlayerObject;
 import net.codeup.codosg.objects.PowerUpObject;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,35 +30,27 @@ public class JoinEvent implements Listener {
 	public void onJoinEvent(PlayerJoinEvent event) throws IOException {
 		Player player = event.getPlayer();
 
-		if(!(loadFile.contains(String.valueOf(player.getUniqueId())))) {
+		if(loadFile.get(player.getUniqueId().toString()) == null) {
 			PlayerObject playerData = createPlayerData(player);
-			loadFile.set(String.valueOf(player.getUniqueId()), playerData);
+			loadFile.set(player.getUniqueId().toString(), playerData);
 			loadFile.save(users);
 			addPlayerData(player, playerData);
 			return;
 		}
 
-		String uuidString = String.valueOf(player.getUniqueId());
-		int wins = loadFile.getInt(uuidString + ".wins");
-		int losses = loadFile.getInt(uuidString + ".losses");
-		int kills = loadFile.getInt(uuidString + ".kills");
-		int assists = loadFile.getInt(uuidString + ".assists");
-		int crystals = loadFile.getInt(uuidString + ".crystals");
-		int darkCrystals = loadFile.getInt(uuidString + ".darkCrystals");
-		int keys = loadFile.getInt(uuidString + ".keys");
-		String currentGame = null;
-		KitObject kitObject = (KitObject) loadFile.get(uuidString + ".selectedKit");
-		ArrayList<HashMap<KitObject, Integer>> unlockedKits = (ArrayList<HashMap<KitObject, Integer>>) loadFile.getList(uuidString + ".unlockedKits");
-		ArrayList<PowerUpObject> unlockedPowerups = (ArrayList<PowerUpObject>) loadFile.getList(uuidString + ".unlockedKits");
+		PlayerObject playerObject = loadFile.getObject(player.getUniqueId().toString(), PlayerObject.class);
+		AllPlayers.getInstance().put(player.getUniqueId(), playerObject);
 
+		System.out.println(AllPlayers.getInstance().get(player.getUniqueId()));
 
-		PlayerObject playerObject = new PlayerObject(player, wins,losses,kills,assists,crystals,darkCrystals,keys,currentGame,kitObject,unlockedKits,unlockedPowerups);
-		addPlayerData(player, playerObject);
+		player.teleport(new Location(Bukkit.getWorld("world"), -41, -21, -80));
+		player.getInventory().clear();
 		new LobbyJoinEvent().lobbyJoinEvent(event.getPlayer());
+
 	}
 
 	private PlayerObject createPlayerData(Player player) {
-		return new PlayerObject(player,0,0,0,0,0,0,0,null,null,null,null);
+		return new PlayerObject(player,0,0,0,0,0,0,0,null,null,new HashMap<>(),new ArrayList<>());
 	}
 
 	private void addPlayerData(Player player, PlayerObject playerObject) {

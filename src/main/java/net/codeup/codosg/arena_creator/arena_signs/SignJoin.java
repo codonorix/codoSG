@@ -5,6 +5,7 @@ import net.codeup.codosg.object_instances.AllArenas;
 import net.codeup.codosg.object_instances.AllJoinSigns;
 import net.codeup.codosg.object_instances.AllPlayers;
 import net.codeup.codosg.objects.ArenaObject;
+import net.codeup.codosg.objects.KitObject;
 import net.codeup.codosg.objects.PlayerObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -139,6 +141,7 @@ public class SignJoin implements Listener {
 				} else if (!gameStarted[0]) {
 					for (Player player : arenaObject.getPlayersInGame()) {
 						player.sendMessage(ChatColor.GREEN + "The game has started!");
+						player.setInvulnerable(true);
 					}
 					gameStarted[0] = true;
 				}
@@ -151,6 +154,7 @@ public class SignJoin implements Listener {
 						for (Player player : arenaObject.getPlayersInGame()) {
 							player.sendMessage(ChatColor.RED + "Grace period has ended!");
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+							player.setInvulnerable(false);
 						}
 					}
 
@@ -158,9 +162,61 @@ public class SignJoin implements Listener {
 						gameStage[0] = 3;
 						nextEventTimer[0] = 60 * 3;
 						nextEvent[0] = "PowerUp Box";
+
 						for (Player player : arenaObject.getPlayersInGame()) {
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
-							player.sendMessage(ChatColor.GREEN + "[!] A powerful star has spawned in one of the chests...");
+
+							PlayerObject playerObject = AllPlayers.getInstance().get(player.getUniqueId());
+							if(playerObject.getSelectedKit() == null) {
+								player.sendMessage(ChatColor.RED + "You haven't selected a kit :(");
+								continue;
+							}
+
+							KitObject kitObject = playerObject.getSelectedKit();
+							int level = playerObject.getUnlockedKits().get(kitObject);
+
+							switch (level) {
+								case 1:
+									for(ItemStack itemStack : kitObject.getLevelOne())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 2:
+									for(ItemStack itemStack : kitObject.getLevelTwo())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 3:
+									for(ItemStack itemStack : kitObject.getLevelThree())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 4:
+									for(ItemStack itemStack : kitObject.getLevelFour())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 5:
+									for(ItemStack itemStack : kitObject.getLevelFive())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 6:
+									for(ItemStack itemStack : kitObject.getLevelSix())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 7:
+									for(ItemStack itemStack : kitObject.getLevelSeven())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 8:
+									for(ItemStack itemStack : kitObject.getLevelEight())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 9:
+									for(ItemStack itemStack : kitObject.getLevelNine())
+										player.getInventory().addItem(itemStack);
+									break;
+								case 10:
+									for(ItemStack itemStack : kitObject.getLevelTen())
+										player.getInventory().addItem(itemStack);
+									break;
+							}
 						}
 					}
 
@@ -170,6 +226,7 @@ public class SignJoin implements Listener {
 						nextEvent[0] = "Chest Refill";
 						for (Player player : arenaObject.getPlayersInGame()) {
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+							player.sendMessage(ChatColor.GREEN + "[!] A powerful star has spawned in one of the chests...");
 						}
 					}
 

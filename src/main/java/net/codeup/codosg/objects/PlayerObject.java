@@ -2,11 +2,12 @@ package net.codeup.codosg.objects;
 
 import org.bukkit.entity.Player;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class PlayerObject {
+public class PlayerObject implements Serializable {
 	private Player player;
 	private int wins;
 	private int losses;
@@ -17,10 +18,10 @@ public class PlayerObject {
 	private int keys;
 	private String currentGame;
 	private KitObject selectedKit;
-	private ArrayList<HashMap<KitObject, Integer>> unlockedKits;
+	private HashMap<KitObject, Integer> unlockedKits;
 	private ArrayList<PowerUpObject> unlockedPowerups;
 
-	public PlayerObject(Player player, int wins, int losses, int kills, int assists, int crystals, int darkCrystals, int keys, String currentGame, KitObject selectedKit, ArrayList<HashMap<KitObject, Integer>> unlockedKits, ArrayList<PowerUpObject> unlockedPowerups) {
+	public PlayerObject(Player player, int wins, int losses, int kills, int assists, int crystals, int darkCrystals, int keys, String currentGame, KitObject selectedKit, HashMap<KitObject, Integer> unlockedKits, ArrayList<PowerUpObject> unlockedPowerups) {
 		this.player = player;
 		this.wins = wins;
 		this.losses = losses;
@@ -115,11 +116,11 @@ public class PlayerObject {
 		this.selectedKit = selectedKit;
 	}
 
-	public ArrayList<HashMap<KitObject, Integer>> getUnlockedKits() {
+	public HashMap<KitObject, Integer> getUnlockedKits() {
 		return unlockedKits;
 	}
 
-	public void setUnlockedKits(ArrayList<HashMap<KitObject, Integer>> unlockedKits) {
+	public void setUnlockedKits(HashMap<KitObject, Integer> unlockedKits) {
 		this.unlockedKits = unlockedKits;
 	}
 
