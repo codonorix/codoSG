@@ -1,5 +1,6 @@
 package net.codeup.codosg.objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bukkit.entity.Player;
 
 import java.io.Serializable;
@@ -17,11 +18,11 @@ public class PlayerObject implements Serializable {
 	private int darkCrystals;
 	private int keys;
 	private String currentGame;
-	private KitObject selectedKit;
-	private HashMap<KitObject, Integer> unlockedKits;
-	private ArrayList<PowerUpObject> unlockedPowerups;
+	private int selectedKit;
+	private HashMap<Integer, Integer> unlockedKits;
+	private ArrayList<Integer> unlockedPowerups;
 
-	public PlayerObject(Player player, int wins, int losses, int kills, int assists, int crystals, int darkCrystals, int keys, String currentGame, KitObject selectedKit, HashMap<KitObject, Integer> unlockedKits, ArrayList<PowerUpObject> unlockedPowerups) {
+	public PlayerObject(Player player, int wins, int losses, int kills, int assists, int crystals, int darkCrystals, int keys, String currentGame, int selectedKit, HashMap<Integer, Integer> unlockedKits, ArrayList<Integer> unlockedPowerups) {
 		this.player = player;
 		this.wins = wins;
 		this.losses = losses;
@@ -108,27 +109,27 @@ public class PlayerObject implements Serializable {
 		this.currentGame = currentGame;
 	}
 
-	public KitObject getSelectedKit() {
+	public int getSelectedKit() {
 		return selectedKit;
 	}
 
-	public void setSelectedKit(KitObject selectedKit) {
+	public void setSelectedKit(int selectedKit) {
 		this.selectedKit = selectedKit;
 	}
 
-	public HashMap<KitObject, Integer> getUnlockedKits() {
+	public HashMap<Integer, Integer> getUnlockedKits() {
 		return unlockedKits;
 	}
 
-	public void setUnlockedKits(HashMap<KitObject, Integer> unlockedKits) {
+	public void setUnlockedKits(HashMap<Integer, Integer> unlockedKits) {
 		this.unlockedKits = unlockedKits;
 	}
 
-	public ArrayList<PowerUpObject> getUnlockedPowerups() {
+	public ArrayList<Integer> getUnlockedPowerups() {
 		return unlockedPowerups;
 	}
 
-	public void setUnlockedPowerups(ArrayList<PowerUpObject> unlockedPowerups) {
+	public void setUnlockedPowerups(ArrayList<Integer> unlockedPowerups) {
 		this.unlockedPowerups = unlockedPowerups;
 	}
 

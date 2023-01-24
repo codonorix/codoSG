@@ -49,10 +49,10 @@ public class KitClickEvent implements Listener {
 		if(!(persistentDataContainer.has(key, PersistentDataType.INTEGER))) return;
 
 		if(event.isLeftClick()) {
-			for (KitObject kitObject : AllKits.getCommonKits()) {
+			for (KitObject kitObject : AllKits.getCommonKits().values()) {
 				if (persistentDataContainer.get(key, PersistentDataType.INTEGER) == kitObject.getId()) {
-					if (playerObject.getUnlockedKits().containsKey(kitObject)) {
-						playerObject.setSelectedKit(kitObject);
+					if (playerObject.getUnlockedKits().containsKey(kitObject.getId())) {
+						playerObject.setSelectedKit(kitObject.getId());
 						player.sendMessage(ChatColor.GREEN + "[!] Selected " + kitObject.getName() + ".");
 						return;
 					}
@@ -62,17 +62,17 @@ public class KitClickEvent implements Listener {
 				}
 			}
 		} else if (event.isRightClick()) {
-			for (KitObject kitObject : AllKits.getCommonKits()) {
+			for (KitObject kitObject : AllKits.getCommonKits().values()) {
 				if (persistentDataContainer.get(key, PersistentDataType.INTEGER) == kitObject.getId()) {
-					if (playerObject.getUnlockedKits().containsKey(kitObject)) {
+					if (playerObject.getUnlockedKits().containsKey(kitObject.getId())) {
 						int crystals = playerObject.getCrystals();
-						int level = playerObject.getUnlockedKits().get(kitObject);
-						HashMap<KitObject, Integer> playerKits = playerObject.getUnlockedKits();
+						int level = playerObject.getUnlockedKits().get(kitObject.getId());
+						HashMap<Integer, Integer> playerKits = playerObject.getUnlockedKits();
 						switch (level + 1) {
 							case 2:
 								if(!(crystals - levelTwo < 0)) {
 									crystals = crystals-levelTwo;
-									playerKits.put(kitObject, 2);
+									playerKits.put(kitObject.getId(), 2);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 2!");
 								}else {
@@ -82,7 +82,7 @@ public class KitClickEvent implements Listener {
 							case 3:
 								if(!(crystals - levelThree < 0)) {
 									crystals = crystals-levelThree;
-									playerKits.put(kitObject, 3);
+									playerKits.put(kitObject.getId(), 3);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 3!");
 								}else {
@@ -92,7 +92,7 @@ public class KitClickEvent implements Listener {
 							case 4:
 								if(!(crystals - levelFour < 0)) {
 									crystals = crystals-levelFour;
-									playerKits.put(kitObject, 4);
+									playerKits.put(kitObject.getId(), 4);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 4!");
 								}else {
@@ -102,7 +102,7 @@ public class KitClickEvent implements Listener {
 							case 5:
 								if(!(crystals - levelFive < 0)) {
 									crystals = crystals-levelFive;
-									playerKits.put(kitObject, 5);
+									playerKits.put(kitObject.getId(), 5);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 5!");
 								}else {
@@ -112,7 +112,7 @@ public class KitClickEvent implements Listener {
 							case 6:
 								if(!(crystals - levelSix < 0)) {
 									crystals = crystals-levelSix;
-									playerKits.put(kitObject, 6);
+									playerKits.put(kitObject.getId(), 6);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 6!");
 								}else {
@@ -122,7 +122,7 @@ public class KitClickEvent implements Listener {
 							case 7:
 								if(!(crystals - levelSeven < 0)) {
 									crystals = crystals-levelSeven;
-									playerKits.put(kitObject, 7);
+									playerKits.put(kitObject.getId(), 7);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 7!");
 								}else {
@@ -132,7 +132,7 @@ public class KitClickEvent implements Listener {
 							case 8:
 								if(!(crystals - levelEight < 0)) {
 									crystals = crystals-levelEight;
-									playerKits.put(kitObject, 8);
+									playerKits.put(kitObject.getId(), 8);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 8!");
 								}else {
@@ -142,7 +142,7 @@ public class KitClickEvent implements Listener {
 							case 9:
 								if(!(crystals - levelNine < 0)) {
 									crystals = crystals-levelNine;
-									playerKits.put(kitObject, 9);
+									playerKits.put(kitObject.getId(), 9);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 9!");
 								}else {
@@ -152,7 +152,7 @@ public class KitClickEvent implements Listener {
 							case 10:
 								if(!(crystals - levelTen < 0)) {
 									crystals = crystals-levelTen;
-									playerKits.put(kitObject, 10);
+									playerKits.put(kitObject.getId(), 10);
 									playerObject.setCrystals(crystals);
 									player.sendMessage(ChatColor.GREEN + "[!] Upgraded to level 10!");
 

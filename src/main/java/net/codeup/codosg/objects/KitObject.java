@@ -3,9 +3,10 @@ package net.codeup.codosg.objects;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class KitObject {
+public class KitObject implements Serializable {
 	private int id;
 	private String name;
 	private Material icon;

@@ -50,7 +50,7 @@ public class KitTableOpen implements Listener {
 	private void kitsInv(Player player) {
 		final int[] counter = {10};
 		final ArrayList<ItemStack> itemStacks = fillerItems();
-		final ArrayList<KitObject> kits = AllKits.getCommonKits();
+		final ArrayList<KitObject> kits = new ArrayList<>(AllKits.getCommonKits().values());
 		final PlayerObject playerObject = AllPlayers.getInstance().get(player.getUniqueId());
 		new BukkitRunnable() {
 			@Override
@@ -76,14 +76,14 @@ public class KitTableOpen implements Listener {
 						playerObject.setUnlockedKits(new HashMap<>());
 					}
 
-					if(playerObject.getUnlockedKits().containsKey(kits.get(0))) {
+					if(playerObject.getUnlockedKits().containsKey(kits.get(0).getId())) {
 						player.sendMessage(ChatColor.GREEN + "[!] You already have the " + kits.get(0).getName() + " kit!");
 						cancel();
 						return;
 					}
 					player.sendMessage(ChatColor.GREEN + "[!] You unlocked the " + kits.get(0).getName() + " kit!");
-					HashMap<KitObject, Integer> kitObjectsFromUser = playerObject.getUnlockedKits();
-					kitObjectsFromUser.put(kits.get(0), 1);
+					HashMap<Integer, Integer> kitObjectsFromUser = playerObject.getUnlockedKits();
+					kitObjectsFromUser.put(kits.get(0).getId(), 1);
 					playerObject.setUnlockedKits(kitObjectsFromUser);
 
 					cancel();

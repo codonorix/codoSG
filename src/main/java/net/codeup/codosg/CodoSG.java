@@ -7,12 +7,12 @@ import net.codeup.codosg.arena_creator.arena_command_inv.arena_edit_gui.ArenaEdi
 import net.codeup.codosg.arena_creator.arena_signs.SignCreator;
 import net.codeup.codosg.arena_creator.arena_signs.SignDestroy;
 import net.codeup.codosg.arena_creator.arena_signs.SignJoin;
-import net.codeup.codosg.arena_creator.events.ChestPlaceEvent;
 import net.codeup.codosg.commands.JoinArena;
 import net.codeup.codosg.commands.admin.CrystalsGive;
 import net.codeup.codosg.commands.admin.KitTable;
 import net.codeup.codosg.lobby.JoinEvent;
 import net.codeup.codosg.lobby.LeaveEvent;
+import net.codeup.codosg.lobby.events.LobbyCoreEvents;
 import net.codeup.codosg.lobby.kit_table.KitTableEffect;
 import net.codeup.codosg.lobby.kit_table.KitTableOpen;
 import net.codeup.codosg.lobby.lobby_events.ItemClickEvent;
@@ -143,19 +143,18 @@ public final class CodoSG extends JavaPlugin {
 		getCommand("crystalsgive").setExecutor(new CrystalsGive());
 
 
-		Bukkit.getPluginManager().registerEvents(new ChestPlaceEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new ArenaEditClickEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new SignCreator(), this);
 		Bukkit.getPluginManager().registerEvents(new SignDestroy(), this);
 		Bukkit.getPluginManager().registerEvents(new SignJoin(), this);
-		Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new ItemClickEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new LobbyMenuClickEvent(), this);
-		Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new LeaveEvent(), this);
+		Bukkit.getPluginManager().registerEvents(new JoinEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new KitTable(), this);
 		Bukkit.getPluginManager().registerEvents(new KitTableOpen(), this);
 		Bukkit.getPluginManager().registerEvents(new KitClickEvent(), this);
+		Bukkit.getPluginManager().registerEvents(new LobbyCoreEvents(), this);
 
 		//?======================| ACHIVE EVENTS |=============================
 		Bukkit.getPluginManager().registerEvents(new ChallengeAchivements(), this);

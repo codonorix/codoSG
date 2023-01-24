@@ -50,7 +50,7 @@ public class ArenaEditClickEvent implements Listener {
 		}
 
 		if(value.equals("LOAD_CHESTS")){
-			new ArenaCoreCommand().loadChests(player, arenaName);
+			new ArenaCoreCommand().loadChests(arenaName);
 		}
 
 		//! Arena spawn point lists

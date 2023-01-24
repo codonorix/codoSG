@@ -1,8 +1,11 @@
 package net.codeup.codosg.arena_creator.arena_signs;
 
 import net.codeup.codosg.CodoSG;
+import net.codeup.codosg.arena_creator.ArenaCoreCommand;
+import net.codeup.codosg.items.PowerStar;
 import net.codeup.codosg.object_instances.AllArenas;
 import net.codeup.codosg.object_instances.AllJoinSigns;
+import net.codeup.codosg.object_instances.AllKits;
 import net.codeup.codosg.object_instances.AllPlayers;
 import net.codeup.codosg.objects.ArenaObject;
 import net.codeup.codosg.objects.KitObject;
@@ -11,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,9 +27,11 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class SignJoin implements Listener {
 	@EventHandler
@@ -67,6 +73,7 @@ public class SignJoin implements Listener {
 
 	public void gameLogic(PlayerObject playerObject, ArenaObject arenaObject) {
 		Player player = playerObject.getPlayer();
+		player.getInventory().clear();
 		player.teleport(arenaObject.getWaitingLobby());
 
 		if (arenaObject.getPlayersInGame().size() == 1) {
@@ -78,7 +85,7 @@ public class SignJoin implements Listener {
 
 	private void startGame(ArenaObject arenaObject) {
 		new BukkitRunnable() {
-			final int[] waitingLobbyCounter = {30};
+			final int[] waitingLobbyCounter = {5};
 
 			@Override
 			public void run() {
@@ -110,10 +117,11 @@ public class SignJoin implements Listener {
 	}
 
 	private void coreGame(ArenaObject arenaObject) {
+		Random random = new Random();
 		final int[] waitingCounter = {15};
 		final boolean[] gameStarted = {false};
 		final int[] mainGameTimer = {200};
-		final int[] nextEventTimer = {15};
+		final int[] nextEventTimer = {2};
 		final int[] gameStage = {1};
 
 		/*
@@ -142,6 +150,14 @@ public class SignJoin implements Listener {
 					for (Player player : arenaObject.getPlayersInGame()) {
 						player.sendMessage(ChatColor.GREEN + "The game has started!");
 						player.setInvulnerable(true);
+
+						gameStarted[0] = true;
+
+						try {
+							new ArenaCoreCommand().loadChests(arenaObject.getName());
+						} catch (IOException e) {
+							throw new RuntimeException(e);
+						}
 					}
 					gameStarted[0] = true;
 				}
@@ -149,7 +165,9 @@ public class SignJoin implements Listener {
 				if (gameStarted[0]) {
 					if(gameStage[0] == 1 && nextEventTimer[0] == 0) {
 						gameStage[0] = 2;
-						nextEventTimer[0] = 60;
+//						nextEventTimer[0] = 60;
+						nextEventTimer[0] = 2;
+
 						nextEvent[0] = "Get Kit";
 						for (Player player : arenaObject.getPlayersInGame()) {
 							player.sendMessage(ChatColor.RED + "Grace period has ended!");
@@ -160,20 +178,22 @@ public class SignJoin implements Listener {
 
 					if(gameStage[0] == 2 && nextEventTimer[0] == 0) {
 						gameStage[0] = 3;
-						nextEventTimer[0] = 60 * 3;
+//						nextEventTimer[0] = 60 * 3;
+						nextEventTimer[0] = 2;
+
 						nextEvent[0] = "PowerUp Box";
 
 						for (Player player : arenaObject.getPlayersInGame()) {
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
 
 							PlayerObject playerObject = AllPlayers.getInstance().get(player.getUniqueId());
-							if(playerObject.getSelectedKit() == null) {
+							if(playerObject.getSelectedKit() == -1) {
 								player.sendMessage(ChatColor.RED + "You haven't selected a kit :(");
 								continue;
 							}
 
-							KitObject kitObject = playerObject.getSelectedKit();
-							int level = playerObject.getUnlockedKits().get(kitObject);
+							KitObject kitObject = AllKits.getCommonKits().get(playerObject.getSelectedKit());
+							int level = playerObject.getUnlockedKits().get(playerObject.getSelectedKit());
 
 							switch (level) {
 								case 1:
@@ -224,9 +244,16 @@ public class SignJoin implements Listener {
 						gameStage[0] = 4;
 						nextEventTimer[0] = 60 * 3;
 						nextEvent[0] = "Chest Refill";
+
+						Location location = arenaObject.getChestLocations().get(random.nextInt(arenaObject.getChestLocations().size() - 1));
+						Chest chest = (Chest) location.getBlock().getState();
+
+						chest.getInventory().setItem(12,new PowerStar().powerStar());
+
 						for (Player player : arenaObject.getPlayersInGame()) {
 							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
 							player.sendMessage(ChatColor.GREEN + "[!] A powerful star has spawned in one of the chests...");
+							player.sendMessage("Location: " + location);
 						}
 					}
 

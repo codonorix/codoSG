@@ -103,7 +103,7 @@ public class ArenaCoreCommand implements CommandExecutor {
 		}
 
 		if(args[2].equalsIgnoreCase("loadChests")) {
-			loadChests(player, arenaName);
+			loadChests(arenaName);
 			return;
 		}
 
@@ -135,7 +135,8 @@ public class ArenaCoreCommand implements CommandExecutor {
 		new ArenaLoaderAndSaver().saveMaps();
 	}
 
-	public void loadChests(Player player, String arenaName) throws IOException {
+	public void loadChests(String arenaName) throws IOException {
+		Random random = new Random();
 		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
 		World world = arenaObject.getSpawnPoints().get(0).getWorld();
 
@@ -146,15 +147,21 @@ public class ArenaCoreCommand implements CommandExecutor {
 					chests.add(blockState.getLocation());
 					Chest chest = (Chest) blockState;
 					chest.getBlockInventory().clear();
-					ArrayList<ItemStack> itemStacks = new WeaponItems().getInstance();
-					Collections.shuffle(itemStacks);
-					chest.getBlockInventory().addItem(itemStacks.get(0));
+					int itemsPlaced = random.nextInt(5);
+
+					for(int i = 0; i < itemsPlaced; i++) {
+						int chestPos = random.nextInt(27);
+
+						ArrayList<ItemStack> itemStacks = new WeaponItems().getInstance();
+						Collections.shuffle(itemStacks);
+						chest.getBlockInventory().setItem(chestPos, itemStacks.get(0));
+					}
+
 				}
 			}
 		}
 
 		arenaObject.setChestLocations(chests);
-		player.sendMessage("Total chests in arena: " + chests.size());
 		new ArenaLoaderAndSaver().saveMaps();
 	}
 

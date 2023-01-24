@@ -48,13 +48,14 @@ public class LobbyMenuClickEvent implements Listener {
 	private void commonKits(Player player) {
 		Inventory inventory = Bukkit.createInventory(new LobbyItemInvHolder(), 9*5, "Common Kits");
 		PlayerObject playerObject = AllPlayers.getInstance().get(player.getUniqueId());
-		for(KitObject kitObject : AllKits.getCommonKits()) {
+		for(KitObject kitObject : AllKits.getCommonKits().values()) {
 			if(playerObject.getUnlockedKits() == null) playerObject.setUnlockedKits(new HashMap<>());
-			if(playerObject.getUnlockedKits().containsKey(kitObject)) {
+
+			if(playerObject.getUnlockedKits().containsKey(kitObject.getId())) {
 				ItemStack itemStack = new ItemStack(kitObject.getIcon());
 				ItemMeta itemMeta = itemStack.getItemMeta();
 
-				itemMeta.setDisplayName(ChatColor.GREEN + kitObject.getName() + " | " + playerObject.getUnlockedKits().get(kitObject));
+				itemMeta.setDisplayName(ChatColor.GREEN + kitObject.getName() + " | " + playerObject.getUnlockedKits().get(kitObject.getId()));
 
 				NamespacedKey namespacedKey = new NamespacedKey(CodoSG.getInstance(), "KIT_ITEM");
 				itemMeta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.INTEGER, kitObject.getId());
