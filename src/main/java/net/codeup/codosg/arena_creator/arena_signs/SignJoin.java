@@ -2,7 +2,7 @@ package net.codeup.codosg.arena_creator.arena_signs;
 
 import net.codeup.codosg.CodoSG;
 import net.codeup.codosg.arena_creator.ArenaCoreCommand;
-import net.codeup.codosg.items.PowerStar;
+import net.codeup.codosg.items.powerstar.PowerStar;
 import net.codeup.codosg.object_instances.AllArenas;
 import net.codeup.codosg.object_instances.AllJoinSigns;
 import net.codeup.codosg.object_instances.AllKits;
@@ -10,10 +10,7 @@ import net.codeup.codosg.object_instances.AllPlayers;
 import net.codeup.codosg.objects.ArenaObject;
 import net.codeup.codosg.objects.KitObject;
 import net.codeup.codosg.objects.PlayerObject;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -34,6 +31,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class SignJoin implements Listener {
+	WorldBorder originalBorder = null;
 	@EventHandler
 	public void onJoinSignClick(PlayerInteractEvent event) {
 		if (event.getClickedBlock() == null) return;
@@ -45,8 +43,8 @@ public class SignJoin implements Listener {
 		if (!(sign.getLine(0).contains("⦓JOIN⦔"))) return;
 		String arenaName = sign.getLine(1);
 
-		ArrayList<Player> players = (ArrayList<Player>) AllArenas.getInstance().get(arenaName).getPlayersInGame();
-		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
+		ArrayList<Player> players = (ArrayList<Player>) AllArenas.getInstance().get(arenaName).getAllPlayers();
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName).getArenaObject();
 
 		if (players.size() >= arenaObject.getSpawnPoints().size()) {
 			player.sendMessage(ChatColor.RED + "[!] This game is full!");
@@ -59,7 +57,7 @@ public class SignJoin implements Listener {
 		}
 
 		players.add(event.getPlayer());
-		AllArenas.getInstance().get(arenaName).setPlayersInGame(players);
+		AllArenas.getInstance().get(arenaName).getArenaObject().setPlayersInGame(players);
 
 
 		for (Location location : AllJoinSigns.getInstance().get(arenaName)) {
@@ -68,13 +66,14 @@ public class SignJoin implements Listener {
 			sign1.update();
 		}
 
-		gameLogic(AllPlayers.getInstance().get(player.getUniqueId()), AllArenas.getInstance().get(arenaName));
+		gameLogic(AllPlayers.getInstance().get(player.getUniqueId()), AllArenas.getInstance().get(arenaName).getArenaObject());
 	}
 
 	public void gameLogic(PlayerObject playerObject, ArenaObject arenaObject) {
 		Player player = playerObject.getPlayer();
 		player.getInventory().clear();
 		player.teleport(arenaObject.getWaitingLobby());
+		AllPlayers.getInstance().get(player.getUniqueId()).setCurrentGame(arenaObject.getName());
 
 		if (arenaObject.getPlayersInGame().size() == 1) {
 			startGame(arenaObject);
@@ -120,7 +119,6 @@ public class SignJoin implements Listener {
 		Random random = new Random();
 		final int[] waitingCounter = {15};
 		final boolean[] gameStarted = {false};
-		final int[] mainGameTimer = {200};
 		final int[] nextEventTimer = {2};
 		final int[] gameStage = {1};
 
@@ -153,11 +151,7 @@ public class SignJoin implements Listener {
 
 						gameStarted[0] = true;
 
-						try {
-							new ArenaCoreCommand().loadChests(arenaObject.getName());
-						} catch (IOException e) {
-							throw new RuntimeException(e);
-						}
+						loadChests(arenaObject);
 					}
 					gameStarted[0] = true;
 				}
@@ -169,11 +163,7 @@ public class SignJoin implements Listener {
 						nextEventTimer[0] = 2;
 
 						nextEvent[0] = "Get Kit";
-						for (Player player : arenaObject.getPlayersInGame()) {
-							player.sendMessage(ChatColor.RED + "Grace period has ended!");
-							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
-							player.setInvulnerable(false);
-						}
+						graceEnds(arenaObject);
 					}
 
 					if(gameStage[0] == 2 && nextEventTimer[0] == 0) {
@@ -183,61 +173,7 @@ public class SignJoin implements Listener {
 
 						nextEvent[0] = "PowerUp Box";
 
-						for (Player player : arenaObject.getPlayersInGame()) {
-							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
-
-							PlayerObject playerObject = AllPlayers.getInstance().get(player.getUniqueId());
-							if(playerObject.getSelectedKit() == -1) {
-								player.sendMessage(ChatColor.RED + "You haven't selected a kit :(");
-								continue;
-							}
-
-							KitObject kitObject = AllKits.getCommonKits().get(playerObject.getSelectedKit());
-							int level = playerObject.getUnlockedKits().get(playerObject.getSelectedKit());
-
-							switch (level) {
-								case 1:
-									for(ItemStack itemStack : kitObject.getLevelOne())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 2:
-									for(ItemStack itemStack : kitObject.getLevelTwo())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 3:
-									for(ItemStack itemStack : kitObject.getLevelThree())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 4:
-									for(ItemStack itemStack : kitObject.getLevelFour())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 5:
-									for(ItemStack itemStack : kitObject.getLevelFive())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 6:
-									for(ItemStack itemStack : kitObject.getLevelSix())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 7:
-									for(ItemStack itemStack : kitObject.getLevelSeven())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 8:
-									for(ItemStack itemStack : kitObject.getLevelEight())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 9:
-									for(ItemStack itemStack : kitObject.getLevelNine())
-										player.getInventory().addItem(itemStack);
-									break;
-								case 10:
-									for(ItemStack itemStack : kitObject.getLevelTen())
-										player.getInventory().addItem(itemStack);
-									break;
-							}
-						}
+						getKits(arenaObject);
 					}
 
 					if(gameStage[0] == 3 && nextEventTimer[0] == 0) {
@@ -245,44 +181,130 @@ public class SignJoin implements Listener {
 						nextEventTimer[0] = 60 * 3;
 						nextEvent[0] = "Chest Refill";
 
-						Location location = arenaObject.getChestLocations().get(random.nextInt(arenaObject.getChestLocations().size() - 1));
-						Chest chest = (Chest) location.getBlock().getState();
+						spawnStar(arenaObject);
+					}
 
-						chest.getInventory().setItem(12,new PowerStar().powerStar());
+					if(gameStage[0] == 4 && nextEventTimer[0] == 0) {
+						gameStage[0] = 5;
+						nextEventTimer[0] = 60 * 5;
+						nextEvent[0] = "Death Match";
 
-						for (Player player : arenaObject.getPlayersInGame()) {
-							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
-							player.sendMessage(ChatColor.GREEN + "[!] A powerful star has spawned in one of the chests...");
-							player.sendMessage("Location: " + location);
-						}
+						loadChests(arenaObject);
 					}
 
 					if(gameStage[0] == 5 && nextEventTimer[0] == 0) {
 						gameStage[0] = 6;
 						nextEventTimer[0] = 60 * 5;
-						nextEvent[0] = "Death Match";
-						for (Player player : arenaObject.getPlayersInGame()) {
-							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
-						}
-					}
-
-					if(gameStage[0] == 6 && nextEventTimer[0] == 0) {
-						gameStage[0] = 7;
-						nextEventTimer[0] = 60 * 5;
 						nextEvent[0] = "Game End";
 						for (Player player : arenaObject.getPlayersInGame()) {
-							player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+							PlayerObject playerObject = AllPlayers.getInstance().get(player.getUniqueId());
+							playerObject.setCurrentGame(null);
 						}
 					}
-
 					nextEventTimer[0]--;
 				}
-
-
 			}
 		}.runTaskTimer(CodoSG.getInstance(), 0, 20);
 	}
 
+	private void loadChests(ArenaObject arenaObject) {
+		try {
+			new ArenaCoreCommand().loadChests(arenaObject.getName());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void graceEnds(ArenaObject arenaObject) {
+		for (Player player : arenaObject.getPlayersInGame()) {
+			player.sendMessage(ChatColor.RED + "Grace period has ended!");
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+			player.setInvulnerable(false);
+		}
+	}
+
+	private void getKits(ArenaObject arenaObject) {
+		for (Player player : arenaObject.getPlayersInGame()) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+
+			PlayerObject playerObject = AllPlayers.getInstance().get(player.getUniqueId());
+			if(playerObject.getSelectedKit() == -1) {
+				player.sendMessage(ChatColor.RED + "You haven't selected a kit :(");
+				continue;
+			}
+
+			KitObject kitObject = AllKits.getCommonKits().get(playerObject.getSelectedKit());
+			int level = playerObject.getUnlockedKits().get(playerObject.getSelectedKit());
+
+			switch (level) {
+				case 1:
+					for(ItemStack itemStack : kitObject.getLevelOne())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 2:
+					for(ItemStack itemStack : kitObject.getLevelTwo())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 3:
+					for(ItemStack itemStack : kitObject.getLevelThree())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 4:
+					for(ItemStack itemStack : kitObject.getLevelFour())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 5:
+					for(ItemStack itemStack : kitObject.getLevelFive())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 6:
+					for(ItemStack itemStack : kitObject.getLevelSix())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 7:
+					for(ItemStack itemStack : kitObject.getLevelSeven())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 8:
+					for(ItemStack itemStack : kitObject.getLevelEight())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 9:
+					for(ItemStack itemStack : kitObject.getLevelNine())
+						player.getInventory().addItem(itemStack);
+					break;
+				case 10:
+					for(ItemStack itemStack : kitObject.getLevelTen())
+						player.getInventory().addItem(itemStack);
+					break;
+			}
+		}
+	}
+
+	private void spawnStar(ArenaObject arenaObject) {
+		Random random = new Random();
+
+		Location location = arenaObject.getChestLocations().get(random.nextInt(arenaObject.getChestLocations().size() - 1));
+		Chest chest = (Chest) location.getBlock().getState();
+
+		chest.getInventory().setItem(12,new PowerStar().powerStar());
+
+		for (Player player : arenaObject.getPlayersInGame()) {
+			player.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+			player.sendMessage(ChatColor.GREEN + "[!] A powerful star has spawned in one of the chests...");
+			player.sendMessage("Location: " + location);
+		}
+	}
+
+	private void deathMatch(ArenaObject arenaObject) {
+		originalBorder = arenaObject.getSpawnPoints().get(0).getWorld().getWorldBorder();
+
+		int pos = 0;
+		for(Player player : arenaObject.getPlayersInGame()) {
+			player.teleport(arenaObject.getSpawnPoints().get(0));
+			pos++;
+		}
+	}
 	private Scoreboard gameBoard(ArrayList<Player> players, int timer, String nextEvent) {
 		Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
 

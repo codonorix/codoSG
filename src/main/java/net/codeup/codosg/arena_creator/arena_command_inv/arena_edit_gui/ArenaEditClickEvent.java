@@ -56,15 +56,15 @@ public class ArenaEditClickEvent implements Listener {
 		//! Arena spawn point lists
 		if(value.equals("ARENA_POS_LIST_ITEM")) {
 			if(e.getAction() == InventoryAction.PICKUP_ALL)
-				removeItem(e.getCurrentItem(), player, AllArenas.getInstance().get(arenaName));
+				removeItem(e.getCurrentItem(), player, AllArenas.getInstance().get(arenaName).getArenaObject());
 			else if(e.getAction() == InventoryAction.PICKUP_HALF) {
-				teleportTo(e.getCurrentItem(), player, AllArenas.getInstance().get(arenaName));
+				teleportTo(e.getCurrentItem(), player, AllArenas.getInstance().get(arenaName).getArenaObject());
 			}
 		}
 	}
 
 	private void waitingLobbyButton(String arenaName, Player player) throws IOException {
-		ArenaObject arena = AllArenas.getInstance().get(arenaName);
+		ArenaObject arena = AllArenas.getInstance().get(arenaName).getArenaObject();
 		if (arena.getWaitingLobby() == null) {
 			arena.setWaitingLobby(player.getLocation());
 			player.sendMessage(ChatColor.GREEN + "[!] Arena waiting lobby set!");
@@ -81,7 +81,7 @@ public class ArenaEditClickEvent implements Listener {
 
 	private void listSpawnPoints(String arenaName, Player player) {
 		Inventory inventory = Bukkit.createInventory(new ArenaEditHolder(), 9*5, ChatColor.LIGHT_PURPLE + "Arenas");
-		ArenaObject arena = AllArenas.getInstance().get(arenaName);
+		ArenaObject arena = AllArenas.getInstance().get(arenaName).getArenaObject();
 
 		if (arena.getSpawnPoints() == null || arena.getSpawnPoints().isEmpty()) {
 			for(int i = 0; i < inventory.getSize(); i++) {

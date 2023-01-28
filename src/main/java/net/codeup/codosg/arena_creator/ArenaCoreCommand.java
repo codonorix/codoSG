@@ -3,9 +3,11 @@ package net.codeup.codosg.arena_creator;
 import net.codeup.codosg.CodoSG;
 import net.codeup.codosg.arena_creator.arena_command_inv.ListArenasInv;
 import net.codeup.codosg.arena_creator.arena_command_inv.arena_edit_gui.ArenaEditInv;
+import net.codeup.codosg.items.ItemInstances;
 import net.codeup.codosg.items.WeaponItems;
 import net.codeup.codosg.object_instances.AllArenas;
 import net.codeup.codosg.objects.ArenaObject;
+import net.codeup.codosg.objects.GameObject;
 import net.codeup.codosg.yml_reader.ArenaLoaderAndSaver;
 import org.bukkit.*;
 import org.bukkit.block.BlockState;
@@ -57,7 +59,8 @@ public class ArenaCoreCommand implements CommandExecutor {
 	private void ListArenas(Player player) {
 		Inventory inventory = new ListArenasInv().listArenaInv();
 
-		for(ArenaObject arenaObject : AllArenas.getInstance().values()) {
+		for(GameObject gameObject: AllArenas.getInstance().values()) {
+			ArenaObject arenaObject = gameObject.getArenaObject();
 			ItemStack itemStack = new ItemStack(Material.BLUE_STAINED_GLASS, 1);
 			ItemMeta itemMeta = itemStack.getItemMeta();
 
@@ -114,14 +117,14 @@ public class ArenaCoreCommand implements CommandExecutor {
 	}
 
 	private void setLobby(Player player, String arenaName) throws IOException {
-		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName).getArenaObject();
 		arenaObject.setWaitingLobby(player.getLocation());
 		player.sendMessage(ChatColor.GREEN + "Waiting lobby set!");
 		new ArenaLoaderAndSaver().saveMaps();
 	}
 
 	private void setSpawnPoint(Player player, String arenaName) throws IOException {
-		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName).getArenaObject();
 
 		List<Location> locations = new ArrayList<>();
 
@@ -137,22 +140,26 @@ public class ArenaCoreCommand implements CommandExecutor {
 
 	public void loadChests(String arenaName) throws IOException {
 		Random random = new Random();
-		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName).getArenaObject();
 		World world = arenaObject.getSpawnPoints().get(0).getWorld();
 
 		ArrayList<Location> chests = new ArrayList<>();
+		ArrayList<ItemStack> itemStacks = new ItemInstances().getCommonItemsinstance();
+//		System.out.println("_-______________________");
+//		System.out.println(itemStacks.toString());
+//		System.out.println("_-______________________");
+
 		for(Chunk chunk : world.getLoadedChunks()) {
 			for (BlockState blockState : chunk.getTileEntities()) {
 				if(blockState instanceof Chest) {
 					chests.add(blockState.getLocation());
 					Chest chest = (Chest) blockState;
 					chest.getBlockInventory().clear();
-					int itemsPlaced = random.nextInt(5);
+					int itemsPlaced = random.nextInt(5) + 1;
 
 					for(int i = 0; i < itemsPlaced; i++) {
 						int chestPos = random.nextInt(27);
 
-						ArrayList<ItemStack> itemStacks = new WeaponItems().getInstance();
 						Collections.shuffle(itemStacks);
 						chest.getBlockInventory().setItem(chestPos, itemStacks.get(0));
 					}
@@ -166,7 +173,7 @@ public class ArenaCoreCommand implements CommandExecutor {
 	}
 
 	private void arenaGUI(Player player, String arenaName) {
-		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName);
+		ArenaObject arenaObject = AllArenas.getInstance().get(arenaName).getArenaObject();
 		player.openInventory(new ArenaEditInv().arenaEditInv(arenaObject));
 	}
 

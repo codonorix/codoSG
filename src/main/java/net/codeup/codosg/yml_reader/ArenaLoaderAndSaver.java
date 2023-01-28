@@ -3,6 +3,7 @@ package net.codeup.codosg.yml_reader;
 import net.codeup.codosg.CodoSG;
 import net.codeup.codosg.object_instances.AllArenas;
 import net.codeup.codosg.objects.ArenaObject;
+import net.codeup.codosg.objects.GameObject;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -27,14 +28,16 @@ public class ArenaLoaderAndSaver {
 			List<Location> chestLocations = (List<Location>) loadFile.getList("maps." + path + ".chestLocaitons");
 
 			ArenaObject arenaObject = new ArenaObject(id, arenaName, waitingLobby, spawnPoints, chestLocations, false, new ArrayList<>());
-			AllArenas.getInstance().put(arenaName, arenaObject);
+			GameObject gameObject = new GameObject(id, arenaName,arenaObject,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+			AllArenas.getInstance().put(arenaName, gameObject);
 		}
 	}
 
 	public void saveMaps() throws IOException {
 		YamlConfiguration modifyFile = YamlConfiguration.loadConfiguration(this.maps);
-		for (ArenaObject arena : AllArenas.getInstance().values()) {
-			modifyFile.set("maps." + arena.getName(), arena);
+		for (GameObject arena : AllArenas.getInstance().values()) {
+
+			modifyFile.set("maps." + arena.getArenaObject().getName(), arena);
 		}
 		modifyFile.save(maps);
 	}

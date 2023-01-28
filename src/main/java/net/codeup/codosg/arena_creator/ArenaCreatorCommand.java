@@ -2,6 +2,7 @@ package net.codeup.codosg.arena_creator;
 
 import net.codeup.codosg.object_instances.AllArenas;
 import net.codeup.codosg.objects.ArenaObject;
+import net.codeup.codosg.objects.GameObject;
 import net.codeup.codosg.yml_reader.ArenaLoaderAndSaver;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -31,7 +32,8 @@ public class ArenaCreatorCommand implements CommandExecutor {
 		}
 
 		ArenaObject arenaObject = new ArenaObject(AllArenas.getInstance().size(), args[0], null, null,null,false, new ArrayList<>());
-		AllArenas.getInstance().put(args[0], arenaObject);
+		GameObject gameObject = new GameObject(arenaObject.getId(), arenaObject.getName(),arenaObject,new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+		AllArenas.getInstance().put(args[0], gameObject);
 
 		try {
 			new ArenaLoaderAndSaver().saveMaps();

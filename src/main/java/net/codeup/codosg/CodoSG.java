@@ -10,6 +10,7 @@ import net.codeup.codosg.arena_creator.arena_signs.SignJoin;
 import net.codeup.codosg.commands.JoinArena;
 import net.codeup.codosg.commands.admin.CrystalsGive;
 import net.codeup.codosg.commands.admin.KitTable;
+import net.codeup.codosg.items.powerstar.PowerStar;
 import net.codeup.codosg.lobby.JoinEvent;
 import net.codeup.codosg.lobby.LeaveEvent;
 import net.codeup.codosg.lobby.events.LobbyCoreEvents;
@@ -155,9 +156,13 @@ public final class CodoSG extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new KitTableOpen(), this);
 		Bukkit.getPluginManager().registerEvents(new KitClickEvent(), this);
 		Bukkit.getPluginManager().registerEvents(new LobbyCoreEvents(), this);
+		Bukkit.getPluginManager().registerEvents(new PowerStar(), this);
+
 
 		//?======================| ACHIVE EVENTS |=============================
 		Bukkit.getPluginManager().registerEvents(new ChallengeAchivements(), this);
+
+		System.out.println("Server running alpha 0.0.6");
 	}
 
 	@Override

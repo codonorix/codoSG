@@ -26,7 +26,7 @@ public class SignCreator implements Listener {
 
 		event.setLine(0, ChatColor.GREEN + "⦓JOIN⦔");
 		event.setLine(1, event.getLine(1));
-		event.setLine(2, ChatColor.WHITE + "0/" + AllArenas.getInstance().get(arenaName).getSpawnPoints().size());
+		event.setLine(2, ChatColor.WHITE + "0/" + AllArenas.getInstance().get(arenaName).getArenaObject().getSpawnPoints().size());
 		event.setLine(3, ChatColor.LIGHT_PURPLE + "-=+=-");
 
 		if(AllJoinSigns.getInstance().containsKey(arenaName)){

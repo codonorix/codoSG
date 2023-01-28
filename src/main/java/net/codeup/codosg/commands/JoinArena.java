@@ -23,7 +23,7 @@ public class JoinArena implements CommandExecutor {
 			return false;
 		}
 
-		player.teleport(AllArenas.getInstance().get(args[0].toLowerCase()).getWaitingLobby());
+		player.teleport(AllArenas.getInstance().get(args[0].toLowerCase()).getArenaObject().getWaitingLobby());
 		return false;
 	}
 }

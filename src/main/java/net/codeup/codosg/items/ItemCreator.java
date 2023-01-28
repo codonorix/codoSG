@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ItemCreator {
 	private String name;
@@ -37,8 +38,11 @@ public class ItemCreator {
 		ArrayList<String> itemDescription = new ArrayList<>();
 
 		if(this.getLore() != null) {
-			itemDescription.addAll(this.getLore());
+			for(String lore : this.getLore()) {
+				itemDescription.add(ChatColor.WHITE + lore);
+			}
 		}
+
 
 		itemDescription.add(addRarity(this.getRarity()));
 		itemMeta.setLore(itemDescription);
